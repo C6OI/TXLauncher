@@ -56,7 +56,7 @@
             this.GamePath.Name = "GamePath";
             this.GamePath.Size = new System.Drawing.Size(416, 43);
             this.GamePath.TabIndex = 2;
-            this.GamePath.Text = "Введите путь до игры, например: C:/Games/TankiX";
+            this.GamePath.Text = "Введите путь до игры, например: C:\\Games\\TankiX";
             this.GamePath.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GamePath_MouseDown);
             // 
             // Launcher
