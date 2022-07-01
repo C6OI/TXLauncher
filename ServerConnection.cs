@@ -1,17 +1,31 @@
-﻿using System.Net.NetworkInformation;
+﻿using System;
+using System.Diagnostics;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 namespace TX_Launcher {
-    class ServerConnection {
-        string host = "play.scptx.tk";
-        string stateServerPart = ":8080";
-        ushort port = 5050;
+    internal class ServerConnection {
+        private readonly string host = "play.scptx.tk";
+        private readonly string stateServerPart = ":8080";
+        private readonly ushort port = 5050;
+        
+        private readonly string listenHost = "localhost";
+        private readonly ushort stateServerListenPort = 8081;
+        private readonly ushort listenPort = 5051;
+        
+        private Process gameProcess;
+        
+        private ushort failedAttempts;
+        private readonly ushort retryTimeout;
+        private uint connectionTime;
+        
+        private Socket serverConnection;
+        private Socket clientConnection;
 
-        string listenHost = "localhost";
-        ushort stateServerListenPort = 8081;
-        ushort listenPort = 5051;
+        private Buffer initialChunks;
 
         public void Connect(string GamePath) {
-            string gamePath = GamePath;
+            string gamePath = GamePath + @"\tankix.exe";
         }
     }
 
