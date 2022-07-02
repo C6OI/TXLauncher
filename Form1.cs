@@ -1,14 +1,17 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using TXLauncher.Properties;
 
 namespace TXLauncher {
     public partial class Launcher : Form {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
 
-        readonly ServerConnection Connect = new();
+        private ServerConnection Connect;
 
         public Launcher() {
             InitializeComponent();
-
             if (!CheckNetwork.CheckNetworkAvailable()) {
                 DialogResult networkInaccesible = MessageBox.Show("Интернет недоступен. Проверьте подключение к интернету.",
                     "Интернет недоступен",
@@ -17,18 +20,22 @@ namespace TXLauncher {
                 if (networkInaccesible == DialogResult.Retry) {
                     Process.Start(Application.ExecutablePath);
                     Environment.Exit(0);
-                } else {
+                }
+                else {
                     Environment.Exit(0);
                 }
             }
+            Connect = new(this);
+            AllocConsole();
         }
 
-        public void ConsoleLabelOutput(string output) {
+        /*public void ConsoleLabelOutput(string output) {
             ConsoleLabel.Text += $"\n{output}";
-        }
+        }*/
 
         void PlayButton_Click(object sender, EventArgs e) {
-            MessageBox.Show("InDev", "Play", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1);
+            //MessageBox.Show("InDev", "Play", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1);
+            Connect.ConnectToServer();
         }
 
         void PlayButton_MouseEnter(object sender, EventArgs e) {

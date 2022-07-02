@@ -6,11 +6,11 @@ using System.Text;
 
 namespace TXLauncher {
     internal class ServerConnection {
-        private Launcher Launcher = new();
+        private Launcher Launcher;
 
         public string gamePath { get; set; }
 
-        private readonly string host = "play.scptx.tk";
+        private readonly string host = "main.txrevive.com";
         private readonly string stateServerPart = ":8080";
         private readonly ushort port = 5050;
 
@@ -23,79 +23,121 @@ namespace TXLauncher {
         private Socket clientConnection;
 
         private ushort failedAttempts;
-        private ushort retryTimeout;
+        private ushort retryTimeout = 5000;
         private DateTime connectionTime;
 
-        private byte[] initialChunks = null;
+
+        private List<byte> initialChunks = new();
         private byte[] _buffer;
-        private int _countOfBytes;
+        private int _countOfBytes = 66;
 
         private ConnectionState state = ConnectionState.DISCONNECTED;
+
+        public ServerConnection(Launcher launcher) {
+            Launcher = launcher;
+        }
 
         void setState(ConnectionState newState) {
             state = newState;
         }
 
-        void BufferServerData(byte[] buffer) {
-            Launcher.ConsoleLabelOutput("got data from server");
+        void BufferServerData(List<byte> buffer) {
+            Console.WriteLine("got data from server");
 
-            string isOverloaded = Encoding.UTF8.GetString(buffer);
+            string isOverloaded = Encoding.UTF8.GetString(buffer.ToArray());
 
             if (isOverloaded == "OVERLOADED") {
-                Launcher.ConsoleLabelOutput("server overloaded");
+                Console.WriteLine("server overloaded");
 
                 setState(ConnectionState.DISCONNECTED);
                 serverConnection.Close();
-            } else {
+            }
+            else {
                 if (state != ConnectionState.CONNECTED_TO_SERVER) {
                     connectionTime = DateTime.Now;
                 }
 
                 setState(ConnectionState.CONNECTED_TO_SERVER);
 
-                if (gamePath == "") {
+                /*if (gamePath == "") {
                     MessageBox.Show("Укажите путь до файла игры");
                 } else if (!gamePath.Trim().ToLower().EndsWith("tankix.exe")) {
                     MessageBox.Show("Укажите файл с названием \"tankix.exe\"");
                 } else {
                     gameProcess ??= Process.Start(gamePath);
-                }
+                }*/
 
-                if (DateTime.Now > connectionTime) {
-                    Launcher.ConsoleLabelOutput("connection timed out");
+                if (DateTime.Now > connectionTime + ) {
+                    Console.WriteLine("connection timed out");
                     serverConnection.Close();
                 }
                 failedAttempts = 0;
             }
 
-            initialChunks ??= new byte[] { };
-            Array.Copy(buffer, initialChunks, initialChunks.Length + buffer.Length);
+            initialChunks?.Clear();
+            initialChunks.AddRange(buffer);
         }
 
-        void ConnectToServer() {
+        void Reconnect() {
+            if (failedAttempts != null) {
+                ConnectToServer();
+            }
+            else {
+                while (state != ConnectionState.WAITING_FOR_DATA) {
+                    ConnectToServer();
+                    Task.Delay(retryTimeout * 2);
+                }
+            }
+        }
+
+        public void ConnectToServer() {
             _buffer = new byte[_countOfBytes];
 
-            IPEndPoint server = new(IPAddress.Parse(host), port);
+            var address = Dns.GetHostAddresses(host);
 
+            IPEndPoint server = new(address[0], port);
             Socket proxyToServer = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            proxyToServer.Connect(server);
 
             while (!proxyToServer.Connected) {
-                Launcher.ConsoleLabelOutput("connecting to server...");
+                Console.WriteLine("connecting to server...");
+                proxyToServer.Connect(server);
                 Task.Delay(1000);
             }
 
-            Launcher.ConsoleLabelOutput("connected to server");
+            NetworkStream Stream = new(proxyToServer);
+
+            Console.WriteLine("connected to server");
             serverConnection = proxyToServer;
             setState(ConnectionState.WAITING_FOR_DATA);
 
             connectionTime = DateTime.Now;
-            NetworkStream Stream = new(proxyToServer);
-            Stream.BeginRead(_buffer, 0, _countOfBytes, ReceiveCallback, null);
+
+            try {
+                Stream.BeginRead(_buffer, 0, _countOfBytes, ReceiveCallback, null);
+            }
+            catch (SocketException) {
+                if (state == ConnectionState.CONNECTED_TO_SERVER ||
+                    state == ConnectionState.READY ||
+                    state == ConnectionState.CLOSED_BY_CLIENT) {
+                    Console.WriteLine("disconnected from server after " + (DateTime.Now - connectionTime));
+                }
+                else {
+                    Console.WriteLine($"connection attempt {++failedAttempts} failed");
+                }
+                setState(state == ConnectionState.READY ?
+                    ConnectionState.CLOSED_BY_SERVER :
+                    ConnectionState.DISCONNECTED);
+
+                serverConnection = null;
+                initialChunks = null;
+                clientConnection?.Close();
+
+                Reconnect();
+            }
         }
 
         void ReceiveCallback(IAsyncResult result) {
-            BufferServerData(_buffer);
+            BufferServerData(_buffer.ToList());
         }
     }
 
