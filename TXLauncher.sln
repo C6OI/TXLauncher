@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TX Launcher", "TX Launcher.csproj", "{968E2504-48C3-4439-91AD-2886E52DF1B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TXLauncher", "TXLauncher.csproj", "{69398A51-3885-4F06-8152-0CFD00EA1BAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{968E2504-48C3-4439-91AD-2886E52DF1B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{968E2504-48C3-4439-91AD-2886E52DF1B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{968E2504-48C3-4439-91AD-2886E52DF1B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{968E2504-48C3-4439-91AD-2886E52DF1B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69398A51-3885-4F06-8152-0CFD00EA1BAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69398A51-3885-4F06-8152-0CFD00EA1BAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69398A51-3885-4F06-8152-0CFD00EA1BAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69398A51-3885-4F06-8152-0CFD00EA1BAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9D3FD9D7-CF2A-4506-8925-CA9D0EB73E95}
+		SolutionGuid = {500D6B61-C8D9-4A07-9402-ADCC5B00EA56}
 	EndGlobalSection
 EndGlobal

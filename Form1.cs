@@ -1,16 +1,14 @@
-﻿using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Windows.Forms;
-using TX_Launcher.Properties;
+﻿using System.Diagnostics;
+using TXLauncher.Properties;
 
-namespace TX_Launcher {
+namespace TXLauncher {
     public partial class Launcher : Form {
 
-        ServerConnection connect = new ServerConnection();
+        readonly ServerConnection Connect = new();
 
         public Launcher() {
             InitializeComponent();
+
             if (!CheckNetwork.CheckNetworkAvailable()) {
                 DialogResult networkInaccesible = MessageBox.Show("Интернет недоступен. Проверьте подключение к интернету.",
                     "Интернет недоступен",
@@ -25,27 +23,34 @@ namespace TX_Launcher {
             }
         }
 
+        public void ConsoleLabelOutput(string output) {
+            ConsoleLabel.Text += $"\n{output}";
+        }
+
         void PlayButton_Click(object sender, EventArgs e) {
             MessageBox.Show("InDev", "Play", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1);
-            connect.Connect(GamePath.Text);
         }
 
         void PlayButton_MouseEnter(object sender, EventArgs e) {
-            PlayButton.Image = new Bitmap(Resources.sprite_play_ru_light);
+            PlayButton.BackgroundImage = new Bitmap(Resources.sprite_play_ru_light);
         }
 
         void PlayButton_MouseLeave(object sender, EventArgs e) {
-            PlayButton.Image = new Bitmap(Resources.sprite_play_ru);
+            PlayButton.BackgroundImage = new Bitmap(Resources.sprite_play_ru);
         }
 
-        void GamePath_MouseDown(object sender, MouseEventArgs e) {
-            GamePath.Text = "";
+        void GameSearch_MouseEnter(object sender, EventArgs e) {
+            GameSearch.BackgroundImage = new Bitmap(Resources.find_light);
         }
 
-        void Launcher_MouseDown(object sender, MouseEventArgs e) {
-            if (GamePath.Text.Trim() == "") {
-                GamePath.Text = "Введите путь до игры, например: C:/Games/TankiX";
-            }
+        void GameSearch_MouseLeave(object sender, EventArgs e) {
+            GameSearch.BackgroundImage = new Bitmap(Resources.find);
+        }
+
+        void GameSearch_Click(object sender, EventArgs e) {
+            GameSearchOpenDialog.ShowDialog();
+
+            Connect.gamePath = GameSearchOpenDialog.FileName;
         }
     }
 }
