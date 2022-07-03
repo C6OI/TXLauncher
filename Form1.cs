@@ -61,7 +61,7 @@ namespace TXLauncher {
         }
 
         void Tracing_Click(object sender, EventArgs e) {
-            Connect.trace = false ? true : false;
+            Connect.trace = !Connect.trace;
         }
     }
 }

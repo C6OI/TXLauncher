@@ -22,6 +22,7 @@ namespace TXLauncher {
         private Process gameProcess;
         private Socket serverConnection;
         private Socket clientConnection;
+        private NetworkStream _stream;
 
         private ushort failedAttempts;
         private ushort retryTimeout = 5000;
@@ -30,7 +31,7 @@ namespace TXLauncher {
 
         private List<byte> initialChunks = new();
         private byte[] _buffer;
-        private int _countOfBytes = 66;
+        private int _countOfBytes = 91;
 
         private ConnectionState state = ConnectionState.DISCONNECTED;
 
@@ -70,10 +71,10 @@ namespace TXLauncher {
                     gameProcess ??= Process.Start(gamePath);
                 }*/
 
-                if (DateTime.Now > connectionTime.AddSeconds(20)) {
+                /*if (DateTime.Now > connectionTime.AddSeconds(20)) {
                     Console.WriteLine("connection timed out");
                     serverConnection.Close();
-                }
+                }*/
                 failedAttempts = 0;
             }
 
@@ -111,6 +112,7 @@ namespace TXLauncher {
             }
 
             NetworkStream Stream = new(proxyToServer);
+            _stream = Stream;
 
             Console.WriteLine("connected to server");
             serverConnection = proxyToServer;
@@ -119,7 +121,7 @@ namespace TXLauncher {
             connectionTime = DateTime.Now;
 
             try {
-                Stream.BeginRead(_buffer, 0, _countOfBytes, ReceiveCallback, null);
+                _stream.BeginRead(_buffer, 0, _countOfBytes, ReceiveCallback, null);
             } catch (SocketException) {
                 if (state == ConnectionState.CONNECTED_TO_SERVER ||
                     state == ConnectionState.READY ||
@@ -142,6 +144,8 @@ namespace TXLauncher {
 
         void ReceiveCallback(IAsyncResult result) {
             BufferServerData(_buffer.ToList());
+            _stream.EndRead(result);
+            _stream.BeginRead(_buffer, 0, _countOfBytes, ReceiveCallback, null);
         }
     }
 
