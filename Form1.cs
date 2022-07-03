@@ -20,8 +20,7 @@ namespace TXLauncher {
                 if (networkInaccesible == DialogResult.Retry) {
                     Process.Start(Application.ExecutablePath);
                     Environment.Exit(0);
-                }
-                else {
+                } else {
                     Environment.Exit(0);
                 }
             }
@@ -36,6 +35,7 @@ namespace TXLauncher {
         void PlayButton_Click(object sender, EventArgs e) {
             //MessageBox.Show("InDev", "Play", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1);
             Connect.ConnectToServer();
+            PlayButton.Enabled = false; Tracing.Enabled = false; GameSearch.Enabled = false;
         }
 
         void PlayButton_MouseEnter(object sender, EventArgs e) {
@@ -58,6 +58,10 @@ namespace TXLauncher {
             GameSearchOpenDialog.ShowDialog();
 
             Connect.gamePath = GameSearchOpenDialog.FileName;
+        }
+
+        void Tracing_Click(object sender, EventArgs e) {
+            Connect.trace = false ? true : false;
         }
     }
 }

@@ -9,6 +9,7 @@ namespace TXLauncher {
         private Launcher Launcher;
 
         public string gamePath { get; set; }
+        public bool trace { get; set; }
 
         private readonly string host = "main.txrevive.com";
         private readonly string stateServerPart = ":8080";
@@ -39,6 +40,9 @@ namespace TXLauncher {
 
         void setState(ConnectionState newState) {
             state = newState;
+            if (trace) {
+                Console.WriteLine(state.ToString());
+            }
         }
 
         void BufferServerData(List<byte> buffer) {
@@ -51,8 +55,7 @@ namespace TXLauncher {
 
                 setState(ConnectionState.DISCONNECTED);
                 serverConnection.Close();
-            }
-            else {
+            } else {
                 if (state != ConnectionState.CONNECTED_TO_SERVER) {
                     connectionTime = DateTime.Now;
                 }
@@ -67,7 +70,7 @@ namespace TXLauncher {
                     gameProcess ??= Process.Start(gamePath);
                 }*/
 
-                if (DateTime.Now > connectionTime + ) {
+                if (DateTime.Now > connectionTime.AddSeconds(20)) {
                     Console.WriteLine("connection timed out");
                     serverConnection.Close();
                 }
@@ -81,8 +84,7 @@ namespace TXLauncher {
         void Reconnect() {
             if (failedAttempts != null) {
                 ConnectToServer();
-            }
-            else {
+            } else {
                 while (state != ConnectionState.WAITING_FOR_DATA) {
                     ConnectToServer();
                     Task.Delay(retryTimeout * 2);
@@ -93,14 +95,18 @@ namespace TXLauncher {
         public void ConnectToServer() {
             _buffer = new byte[_countOfBytes];
 
-            var address = Dns.GetHostAddresses(host);
+            IPAddress[] address = Dns.GetHostAddresses(host);
 
             IPEndPoint server = new(address[0], port);
             Socket proxyToServer = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             while (!proxyToServer.Connected) {
-                Console.WriteLine("connecting to server...");
-                proxyToServer.Connect(server);
+                try {
+                    Console.WriteLine("connecting to server...");
+                    proxyToServer.Connect(server);
+                } catch {
+                    Console.WriteLine("server not responding");
+                }
                 Task.Delay(1000);
             }
 
@@ -114,14 +120,12 @@ namespace TXLauncher {
 
             try {
                 Stream.BeginRead(_buffer, 0, _countOfBytes, ReceiveCallback, null);
-            }
-            catch (SocketException) {
+            } catch (SocketException) {
                 if (state == ConnectionState.CONNECTED_TO_SERVER ||
                     state == ConnectionState.READY ||
                     state == ConnectionState.CLOSED_BY_CLIENT) {
                     Console.WriteLine("disconnected from server after " + (DateTime.Now - connectionTime));
-                }
-                else {
+                } else {
                     Console.WriteLine($"connection attempt {++failedAttempts} failed");
                 }
                 setState(state == ConnectionState.READY ?
@@ -153,8 +157,7 @@ namespace TXLauncher {
             try {
                 var reply = ping.Send(host, timeout, buffer, options);
                 return reply.Status == IPStatus.Success;
-            }
-            catch (PingException) {
+            } catch (PingException) {
                 return false;
             }
         }

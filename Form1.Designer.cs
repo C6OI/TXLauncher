@@ -28,6 +28,7 @@
             this.GameSearchOpenDialog = new System.Windows.Forms.OpenFileDialog();
             this.GameSearch = new System.Windows.Forms.Button();
             this.ConsoleLabel = new System.Windows.Forms.Label();
+            this.Tracing = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // PlayButton
@@ -85,7 +86,19 @@
             this.ConsoleLabel.Name = "ConsoleLabel";
             this.ConsoleLabel.Size = new System.Drawing.Size(1027, 100);
             this.ConsoleLabel.TabIndex = 4;
-            this.ConsoleLabel.Text = "Вывод с консоли";
+            // 
+            // Tracing
+            // 
+            this.Tracing.BackColor = System.Drawing.Color.Transparent;
+            this.Tracing.Font = new System.Drawing.Font("QuadratGroteskNew", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.Tracing.ForeColor = System.Drawing.Color.Black;
+            this.Tracing.Location = new System.Drawing.Point(871, 506);
+            this.Tracing.Name = "Tracing";
+            this.Tracing.Size = new System.Drawing.Size(168, 50);
+            this.Tracing.TabIndex = 5;
+            this.Tracing.Text = "Трассировка в консоль";
+            this.Tracing.UseVisualStyleBackColor = false;
+            this.Tracing.Click += new System.EventHandler(this.Tracing_Click);
             // 
             // Launcher
             // 
@@ -95,6 +108,7 @@
             this.BackgroundImage = global::TXLauncher.Properties.Resources.Site_BD17_1920x8402;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1051, 561);
+            this.Controls.Add(this.Tracing);
             this.Controls.Add(this.ConsoleLabel);
             this.Controls.Add(this.GameSearch);
             this.Controls.Add(this.PlayButton);
@@ -115,6 +129,7 @@
         private System.Windows.Forms.OpenFileDialog GameSearchOpenDialog;
         private System.Windows.Forms.Button GameSearch;
         private Label ConsoleLabel;
+        private CheckBox Tracing;
     }
 }
 
